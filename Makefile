@@ -20,13 +20,16 @@ PREFIX                  ?= $(shell pwd)
 BIN_DIR                 ?= $(shell pwd)
 DOCKER_IMAGE_NAME       ?= prometheus
 DOCKER_IMAGE_TAG        ?= $(subst /,-,$(shell git rev-parse --abbrev-ref HEAD))
+DOCKER_BUILD_IMAGE      ?= prometheus-build-image
 
 ifdef DEBUG
 	bindata_flags = -debug
 endif
 
-
 all: format build test
+
+build-image:
+	@docker build -t $(DOCKER_BUILD_IMAGE) -f build/Dockerfile.build .
 
 style:
 	@echo ">> checking code style"
@@ -52,9 +55,9 @@ vet:
 	@echo ">> vetting code"
 	@$(GO) vet $(pkgs)
 
-build: promu
-	@echo ">> building binaries"
-	@$(PROMU) build --prefix $(PREFIX)
+build: build-image
+	@echo ">> building binaries using docker"
+	@docker run --rm -v $(PWD):/go/src/github.com/prometheus/prometheus $(DOCKER_BUILD_IMAGE) /bin/sh -c "promu build --prefix ${PREFIX}"
 
 tarball: promu
 	@echo ">> building release tarball"
@@ -77,4 +80,4 @@ promu:
 	$(GO) get -u github.com/prometheus/promu
 
 
-.PHONY: all style check_license format build test vet assets tarball docker promu
+.PHONY: all style check_license format build test vet assets tarball docker promu build-image
