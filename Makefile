@@ -56,7 +56,7 @@ vet:
 
 build: build-image
 	@echo ">> building binaries using docker"
-	@docker run --rm -v $(PWD):/go/src/github.com/prometheus/prometheus $(DOCKER_BUILD_IMAGE) /bin/sh -c "promu build"
+	@docker run --rm -v $(PWD):/go/src/github.com/prometheus/prometheus $(DOCKER_BUILD_IMAGE) /bin/sh -c "export CGO_ENABLED=0 && promu build"
 
 tarball: promu
 	@echo ">> building release tarball"
