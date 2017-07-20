@@ -1,6 +1,7 @@
 FROM golang:1.8.3
 
-RUN go get github.com/tools/godep && \
-  go get -u github.com/prometheus/promu
+RUN git config --global http.proxy ${http_proxy} \
+  && go get github.com/tools/godep \
+  && go get -u github.com/prometheus/promu
 
 WORKDIR /go/src/github.com/prometheus/prometheus
