@@ -20,6 +20,9 @@ PREFIX                  ?= $(shell pwd)
 BIN_DIR                 ?= $(shell pwd)
 DOCKER_IMAGE_NAME       ?= prometheus
 DOCKER_BUILD_IMAGE      ?= prometheus-build-image
+BUILD_ARGS              ?= --build-arg http_proxy=$$http_proxy \
+		                       --build-arg https_proxy=$$https_proxy \
+		                       --build-arg no_proxy=$$no_proxy
 
 ifdef DEBUG
 	bindata_flags = -debug
@@ -28,7 +31,7 @@ endif
 all: format build test
 
 build-image:
-	@docker build -t $(DOCKER_BUILD_IMAGE) -f build/Dockerfile.build .
+	@docker build $(BUILD_ARGS) -t $(DOCKER_BUILD_IMAGE) -f build/Dockerfile.build .
 
 style:
 	@echo ">> checking code style"
